@@ -5,17 +5,6 @@
 //  This demo connects the MSP430 and CC3000 via the SPI bus. 
 //
 //
-//
-//                                /|\  /|\
-//                    LCD         10k  10k      MSP430F5529
-//                   slave         |    |         master
-//             -----------------   |    |   -----------------
-//           -|              SDA|<-|----+->|P3.0/UCB0SDA  XIN|-
-//            |                 |  |       |                 |
-//           -|                 |  |       |             XOUT|-
-//            |              SCL|<-+------>|P3.1/UCB0SCL     |
-//            |                 |          |                 |
-//
 //   Victor Lellis
 //   March 2015
 //   Built with CCSv6 with GNU v4.9.1 (Red Hat)
