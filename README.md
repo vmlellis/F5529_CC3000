@@ -1,10 +1,9 @@
 ```
 //******************************************************************************
-//  MSP430F5529 Demo - LCD
+//  MSP430F5529 Demo - CC3000
 //
-//  This demo connects the MSP430 and LCD via the I2C bus. 
-//  The master transmits to the slave. This is the MASTER CODE.
-//  Check if MPU6050 is enaled.
+//  This demo connects the MSP430 and CC3000 via the SPI bus. 
+//
 //
 //
 //                                /|\  /|\
