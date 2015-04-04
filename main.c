@@ -4,10 +4,16 @@
  *  Construido com a IDE CCSv6 e compilador GNU v4.9.1 (Red Hat)
  */
 
+#define WLAN_SSID       "ssid_name"        // cannot be longer than 32 characters!
+#define WLAN_PASS       "supersecret"
 
 #include <msp430f5529.h>
 #include "setup.h"
 #include "uart/uart_tx.h"
+#include "i2c/lcd/lcd.h"
+#include "i2c/lcd/lcd_blue.h"
+#include "spi/cc3000/WiFi.h"
+#include "spi/cc3000/WiFiServer.h"
 
 volatile int counter = 0;
 volatile int counterRX = 0;
@@ -65,6 +71,12 @@ uint8_t lcdEnabled = 0;
 
 // WiFi
 extern void IntSpiGPIOHandler(void);
+uint8_t wifiInit = 0;
+unsigned int timeoutWifi = 30000;   // Milliseconds
+
+char ssid[] = WLAN_SSID;     //  your network SSID (name)
+char pass[] = WLAN_PASS;     //  your network SSID (name)
+
 
 /*
  * main.c
@@ -78,14 +90,92 @@ int main(void) {
     enableWatchDog();
     saveUsbPower();
     setupUart();
-    //setupSPI();
     setupI2C();
+
+    if (WiFi_init()) {
+    	wifiInit = 1;
+    }
+
 
     magEnabled = 0;
     barEnabled = 0;
     mpuEnabled = 0;
     lcdEnabled = 0;
 
+    uint8_t lcdEnabled = lcd_blue_detect();
+    if (lcdEnabled) {
+    	lcd_blue_config();
+    	lcd_clear();
+    }
+
+    if (wifiInit) {
+		uart_printf("Conectando no WiFi...\r\n");
+		if (lcdEnabled) {
+			lcd_print("Conectando...   ");
+		}
+
+		if (WiFi_connectClosedAP(ssid, WLAN_SEC_WPA2, pass, timeoutWifi)) {
+			if (lcdEnabled) {
+				lcd_print("Conectado!      ");
+			}
+
+			uint8_t ip_address[4];
+			if (WiFi_getLocalIP((uint32_t *)ip_address)) {
+				uart_printf("IP: %i.%i.%i.%i\r\n", ip_address[0], ip_address[1], ip_address[2], ip_address[3]);
+			}
+
+			uint8_t mac[6];
+			if (Wifi_getMacAddress(mac)) {
+				uart_printf("MAC: %x:%x:%x:%x:%x:%x\r\n", mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
+			}
+
+			uint8_t ver[2];
+			if (WiFi_getFirmwareVersion(ver)) {
+				uart_printf("FW Version: %i.%i\r\n", ver[0], ver[1]);
+			}
+
+			uint8_t subnet[4];
+			if (WiFi_getSubnetMask((uint32_t *) subnet)) {
+				uart_printf("Subnet: %i.%i.%i.%i\r\n", subnet[0], subnet[1], subnet[2], subnet[3]);
+			}
+
+			uint8_t gateway[4];
+			if (WiFi_getGatewayIP((uint32_t *) gateway)) {
+				uart_printf("Gateway: %i.%i.%i.%i\r\n", gateway[0], gateway[1], gateway[2], gateway[3]);
+			}
+
+			char wifi_ssid[32];
+			if(WiFi_getSSID(wifi_ssid)) {
+				uart_printf("SSID: %s\r\n", wifi_ssid);
+			}
+
+			uint8_t hostIp[4];
+			if (WiFi_dnsLookup("google.com", (uint32_t *)hostIp)) {
+				uart_printf("Google IP: %i.%i.%i.%i\r\n", hostIp[0], hostIp[1], hostIp[2], hostIp[3]);
+			}
+
+			if (WiFiServer_init(80)) {
+				uart_printf("Servidor inicializado\r\n");
+			}
+			else {
+				uart_printf("Erro na inicialização do servidor!\r\n");
+			}
+
+
+		}
+		else {
+			if (lcdEnabled) {
+				lcd_print("Erro na conexão!");
+			}
+		}
+
+    }
+    else {
+    	uart_printf("Erro na Inicialização do WiFi!\r\n");
+    	if (lcdEnabled) {
+			lcd_print("Erro no Wifi!   ");
+		}
+    }
 
 
     while (1) {
@@ -232,7 +322,9 @@ void TIMER0_A0_ISR (void)
 }
 */
 
-
+/*
+ * Interrupção necessária para o funcionamento do CC3000
+ */
 __attribute__((interrupt(PORT2_VECTOR)))
 void PORT2_ISR (void)
 {

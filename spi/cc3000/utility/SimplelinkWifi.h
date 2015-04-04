@@ -11,7 +11,7 @@
 #include "nvmem.h"
 #include "security.h"
 #include "socket.h"
-#include "board.h"
+#include "../board.h"
 #include "patch.h"
 #include "wlan.h"
 

@@ -15,6 +15,7 @@
 //#include "spi/usci_spi.h"
 
 extern volatile unsigned long wdt_overflow_count;
+extern volatile unsigned long wdt_millis;
 
 /*
  * Desabilita o temporizador WatchDog (WDT)
@@ -202,6 +203,15 @@ void setupI2C() {
 	//usci_spi_initialize();
 	init_spi();
 }*/
+
+unsigned long millis()
+{
+	unsigned long m;
+	__disable_interrupt();
+	m = wdt_millis;
+	__enable_interrupt();
+ 	return m;
+}
 
 unsigned long micros()
 {

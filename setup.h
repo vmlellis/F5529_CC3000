@@ -79,5 +79,6 @@ void delay(uint32_t);
 void delayMicroseconds(uint32_t);
 uint8_t read_bits(uint8_t, uint8_t, uint8_t);
 uint8_t write_bits(uint8_t, uint8_t, uint8_t);
+unsigned long millis();
 
 #endif /* CONFIG_H_ */

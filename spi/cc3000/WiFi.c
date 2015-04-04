@@ -13,9 +13,7 @@
  */
 
 #include "WiFi.h"
-#include "utility/SimplelinkWifi.h"
-
-#define CC3000_SUCCESS  0
+//#include "utility/fw_patch.h" // Removido por utilizar grande quantidade da ROM
 
 #define DISABLE	(0)
 #define ENABLE	(1)
@@ -44,6 +42,9 @@ static uint8_t _networkEncr[WL_NETWORKS_LIST_MAXNUM];
 // Para checar se foi inicializado
 uint8_t cc3000_is_initialized = 0;
 uint8_t cc3000_numNetworsScanned = 0;
+
+// Para controle do socket
+static uint8_t calculator_socket_number = 0;
 
 /*
  * Seta os valores de Timeout do CC3000;
@@ -219,6 +220,8 @@ uint8_t WiFi_connectOpenAP(char* ssid, unsigned int timeout) {
 
 	ulCC3000WasConnected = 0;
 
+	unsigned long time = millis();
+
 	/* This will ensure that CC3000 does not attempt to connect to a previously configuration from SmartConfig session */
 	if (wlan_ioctl_set_connection_policy(DISABLE, DISABLE, DISABLE) != CC3000_SUCCESS)
 		return 0; // ERRO: Erro na funcao wlan_ioctl_set_connection_policy
@@ -229,6 +232,24 @@ uint8_t WiFi_connectOpenAP(char* ssid, unsigned int timeout) {
 	if (timeout > 0)
 		delay(timeout); // timeout informado pelo usuario
 
+	if (timeout != 0) {
+		if ( (millis() - time) > timeout ) {
+			return 0;
+		}
+	}
+
+	/* Wait for DHCP */
+	while (ulCC3000DHCP == 0) {
+		if (timeout != 0) {
+			if ( (millis() - time) > timeout ) {
+				return 0;
+			}
+		}
+		else {
+			delay(500);
+		}
+	}
+
 	return 1;
 }
 
@@ -237,7 +258,7 @@ uint8_t WiFi_connectOpenAP(char* ssid, unsigned int timeout) {
  * security: WLAN_SEC_WEP / WLAN_SEC_WPA / WLAN_SEC_WPA2
  * Retorno: Sucesso na conexao (Não necessariamente estah conectado, pois o processo eh assincrono)
  */
-uint8_t WiFi_connectClosedAP(char* ssid, unsigned int security, const char* pass, unsigned int timeout) {
+uint8_t WiFi_connectClosedAP(char* ssid, uint8_t security, const char* pass, unsigned int timeout) {
 
 	if (!cc3000_is_initialized)
 		return 0;
@@ -251,6 +272,8 @@ uint8_t WiFi_connectClosedAP(char* ssid, unsigned int security, const char* pass
 
 	ulCC3000WasConnected = 0;
 
+	unsigned long time = millis();
+
 	/* This will ensure that CC3000 does not attempt to connect to a previously configuration from SmartConfig session */
 	if (wlan_ioctl_set_connection_policy(DISABLE, DISABLE, DISABLE) != CC3000_SUCCESS)
 		return 0; // ERRO: Erro na funcao wlan_ioctl_set_connection_policy
@@ -260,8 +283,24 @@ uint8_t WiFi_connectClosedAP(char* ssid, unsigned int security, const char* pass
 		return 0;
 	}
 
-	if (timeout > 0)
-		delay(timeout); // timeout informado pelo usuario
+
+	if (timeout != 0) {
+		if ( (millis() - time) > timeout ) {
+			return 0;
+		}
+	}
+
+	/* Wait for DHCP */
+	while (ulCC3000DHCP == 0) {
+		if (timeout != 0) {
+			if ( (millis() - time) > timeout ) {
+				return 0;
+			}
+		}
+		else {
+			delay(500);
+		}
+	}
 
 	return 1;
 }
@@ -331,9 +370,18 @@ uint8_t WiFi_startSmartConfig(unsigned int timeout) {
 
 
 	// Wait for Smartconfig process complete
+	unsigned long time = millis();
 	while (ulSmartConfigFinished == 0)
 	{
-		delay(500);
+		//delay(500);
+		if (timeout != 0) {
+			if ( (millis() - time) > timeout ) {
+				return 0;
+			}
+		}
+		else {
+			delay(500);
+		}
 	}
 
 
@@ -367,8 +415,17 @@ uint8_t WiFi_startSmartConfig(unsigned int timeout) {
 
 	wlan_start(0);
 
-	if (timeout > 0)
-		delay(timeout);
+	/* Wait for connection and DHCP-assigned IP address */
+	while (ulCC3000DHCP == 0) {
+		if (timeout != 0) {
+			if ( (millis() - time) > timeout ) {
+				return 0;
+			}
+		}
+		else {
+			delay(500);
+		}
+	}
 
 
 	/* If we make it this far, we need to tell the SmartConfig app to stop */
@@ -451,25 +508,31 @@ uint8_t WiFi_getLocalIP(uint32_t* localIP)
 /*
  * Gateway do CC3000
  */
-uint32_t WiFi_getGatewayIP()
+uint8_t WiFi_getGatewayIP(uint32_t* gatewayIP)
 {
-	uint32_t* gatewayIP = NULL;
+	if (!cc3000_is_initialized) {
+		return 0;
+	}
+
 	tNetappIpconfigRetArgs config;
 	netapp_ipconfig(&config);
 	memcpy(gatewayIP, &(config.aucDefaultGateway), sizeof(config.aucDefaultGateway));
-	return *gatewayIP;
+	return 1;
 }
 
 /*
  * Mascara de rede do CC3000
  */
-uint32_t WiFi_getSubnetMask()
+uint8_t WiFi_getSubnetMask(uint32_t* subnetMask)
 {
-	uint32_t* subnetMask = NULL;
+	if (!cc3000_is_initialized) {
+		return 0;
+	}
+
 	tNetappIpconfigRetArgs config;
 	netapp_ipconfig(&config);
 	memcpy(subnetMask, &(config.aucSubnetMask), sizeof(config.aucSubnetMask));
-	return *subnetMask;
+	return 1;
 }
 
 /*
@@ -495,14 +558,39 @@ uint8_t WiFi_getSSID(char* ssid) {
  * PS.: Precisa ser realizado o SmartConfig primeiro
  */
 uint8_t WiFi_fastConnect(unsigned int timeout) {
-	// TODO
+	ulCC3000WasConnected = 0;
+
+	ulSmartConfigFinished = 0;
+	ulCC3000Connected = 0;
+	ulCC3000DHCP = 0;
+	OkToDoShutDown=0;
+
+	if (!cc3000_is_initialized)
+		return 0;
+
+	// Reset all the previous configuration
+	if (wlan_ioctl_set_connection_policy(DISABLE, DISABLE, ENABLE) != CC3000_SUCCESS) {
+		return 0;
+	}
+
+	if (timeout > 0) {
+		unsigned long time = millis();
+		while (ulCC3000DHCP == 0) {
+			if (timeout != 0) {
+				if ( (millis() - time) > timeout ) {
+					return 0;
+				}
+			}
+		}
+	}
+
 	return 1;
 }
 
 /*
  * Procura um endereço IP de um determinado nome de host
  */
-uint8_t WiFi_dnsLookup(char *hostname, uint32_t* ip_address) {
+uint8_t WiFi_dnsLookup(const char *hostname, uint32_t* ip_address) {
 	uint32_t ret_ip_addr;
 
 	if (!cc3000_is_initialized) {
@@ -529,14 +617,127 @@ uint8_t WiFi_dnsLookup(char *hostname, uint32_t* ip_address) {
 /*
  * Realizar o update do Firmware para a versão 1.1.0
  */
-uint8_t WiFi_updateFirmware() {
-	// TODO
-	return 1;
+//uint8_t WiFi_updateFirmware() {
+//	int8_t mac_status = -1;
+//	uint8_t cMacFromEeprom[MAC_ADDR_LEN];
+//	uint8_t cRMParamsFromEeprom[128];
+//	uint8_t ucStatus_Dr, ucStatus_FW, return_status = 0xFF;
+//	uint16_t index;
+//	uint8_t *pRMParams;
+//	uint8_t counter = 0;
+//
+//	/* Read MAC address */
+//	mac_status = nvmem_get_mac_address(cMacFromEeprom);
+//
+//	return_status = 1;
+//
+//	while ((return_status) && (counter < 3))
+//	{
+//		/* Read RM parameters
+//		 * Read in 16 parts to work with tiny driver */
+//
+//		return_status = 0;
+//		pRMParams = cRMParamsFromEeprom;
+//
+//		for (index = 0; index < 16; index++)
+//		{
+//			return_status |= nvmem_read(NVMEM_RM_FILEID, 8, 8*index, pRMParams);
+//			pRMParams += 8;
+//		}
+//		counter++;
+//	}
+//
+//	/* If RM file is not valid, load the default one */
+//	if (counter == 3)
+//	{
+//		pRMParams = (unsigned char *)cRMdefaultParams;
+//	}
+//	else
+//	{
+//		pRMParams = cRMParamsFromEeprom;
+//	}
+//
+//	return_status = 1;
+//
+//	wlan_stop();
+//	/* Give it a second to stop */
+//	delay(1000);
+//	/* Start and indicate that there is a patch available */
+//	pio_init();
+//	wlan_start(1);
+//
+//	return_status = 1;
+//
+//	while (return_status)
+//	{
+//		/* write RM parameters
+//		 * write in 4 parts to work with tiny driver */
+//		return_status = 0;
+//
+//		for (index = 0; index < 4; index++)
+//		{
+//			return_status |= nvmem_write(NVMEM_RM_FILEID, 32, 32*index, (pRMParams + 32*index));
+//		}
+//	}
+//
+//	return_status = 1;
+//
+//	/* write back the MAC address, only if exist */
+//	if (mac_status == 0)
+//	{
+//		/* zero out MCAST bit if set */
+//		cMacFromEeprom[0] &= 0xfe;
+//		while (return_status)
+//		{
+//			return_status = nvmem_set_mac_address(cMacFromEeprom);
+//		}
+//	}
+//
+//	ucStatus_Dr = 1;
+//
+//	while (ucStatus_Dr)
+//	{
+//		/* Write driver patch to EEPRROM
+//		 * Note that the array itself is changing between the different Service Packs */
+//		ucStatus_Dr = nvmem_write_patch(NVMEM_WLAN_DRIVER_SP_FILEID, drv_length, wlan_drv_patch);
+//	}
+//	if(ucStatus_Dr != CC3000_SUCCESS) return 0;
+//
+//	ucStatus_FW = 1;
+//
+//	while (ucStatus_FW)
+//	{
+//		/* Write FW patch to EEPRROM
+//		 * Note that the array itself is changing between the different Service Packs */
+//		ucStatus_FW = nvmem_write_patch(NVMEM_WLAN_FW_SP_FILEID, fw_length, fw_patch);
+//	}
+//
+//	if(ucStatus_FW != CC3000_SUCCESS) return 0;
+//
+//	/* Init board and request to load with patches. */
+//	wlan_stop();
+//	delay(1000);
+//	wlan_start(0);
+//
+//	return 1;
+//}
+
+/*
+ * Verifica se tem soquete de rede disponivel para o CC3000
+ */
+uint8_t WiFi_countSocket(uint8_t add_sock) {
+	if(add_sock)
+		calculator_socket_number++;
+	else
+		calculator_socket_number--;
+
+	return (calculator_socket_number <= 4);
 }
 
+uint8_t WiFi_getInitStatus() {
+	return cc3000_is_initialized;
+}
 
-
-
-
-
-
+uint8_t WiFi_getDHCPStatus() {
+	return ulCC3000DHCP == 1;
+}

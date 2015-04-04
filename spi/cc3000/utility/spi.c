@@ -44,7 +44,7 @@
 #include "hci.h"
 #include "interface.h"
 #include "evnt_handler.h"
-#include "board.h"
+#include "../board.h"
 
 
 #define READ                    3
@@ -92,9 +92,9 @@ tSpiInformation sSpiInformation;
 
 // buffer for 5 bytes of SPI HEADER
 unsigned char tSpiReadHeader[] = {READ, 0, 0, 0, 0};
-uint8_t CSpin=0;
-uint8_t ENpin=0;
-uint8_t IRQpin=0;
+//uint8_t CSpin=0;
+//uint8_t ENpin=0;
+//uint8_t IRQpin=0;
 
 void SpiWriteDataSynchronous(unsigned char *data, unsigned short size);
 void SpiWriteAsync(const unsigned char *data, unsigned short size);

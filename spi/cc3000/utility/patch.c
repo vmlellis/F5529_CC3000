@@ -3,7 +3,7 @@
 #include "nvmem.h"
 #include "socket.h"
 #include "netapp.h"
-#include "board.h"
+#include "../board.h"
 
 
 //*****************************************************************************

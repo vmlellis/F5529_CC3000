@@ -36,7 +36,7 @@
 #ifndef BOARD_H
 #define	BOARD_H
 
-#include "../../../setup.h"
+#include "../../setup.h"
 
 void pio_init();
 

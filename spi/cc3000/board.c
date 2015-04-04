@@ -32,14 +32,14 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *
 *****************************************************************************/
-#include "wlan.h" 
-#include "evnt_handler.h"    // callback function declaration
-#include "nvmem.h"
-#include "socket.h"
-#include "netapp.h"
+#include "utility/wlan.h"
+#include "utility/evnt_handler.h"    // callback function declaration
+#include "utility/nvmem.h"
+#include "utility/socket.h"
+#include "utility/netapp.h"
 #include "board.h"
-#include "interface.h"
-#include "../../../setup.h"
+#include "utility/interface.h"
+#include "../../setup.h"
 
 #define FIRST_TIME_CONFIG_SET 0xAA
 
@@ -47,9 +47,9 @@ extern unsigned char * ptrFtcAtStartup;
 
 extern volatile void (*FuncP2Bit0)(void);
 
-extern uint8_t CSpin;
-extern uint8_t ENpin;
-extern uint8_t IRQpin;
+//extern uint8_t CSpin;
+//extern uint8_t ENpin;
+//extern uint8_t IRQpin;
 //*****************************************************************************
 //
 //! pio_init
