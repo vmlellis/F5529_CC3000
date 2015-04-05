@@ -150,6 +150,11 @@ void uart_printf(char *format, ...)
           puth(i >> 4);
           puth(i);
           break;
+        case 'h':// 8 bit heXadecimal
+		  i = va_arg(a, int);
+		  puth(i >> 4);
+		  puth(i);
+		  break;
         case 'f': // Float
           f = va_arg(a, double);
           ftoa(f, 2);

@@ -174,7 +174,7 @@ SpiOpen(gcSpiHandleRx pfRxHandler)
 	sSpiInformation.usRxPacketLength = 0;
 	spi_buffer[CC3000_RX_BUFFER_SIZE - 1] = CC3000_BUFFER_MAGIC_NUMBER;
 	wlan_tx_buffer[CC3000_TX_BUFFER_SIZE - 1] = CC3000_BUFFER_MAGIC_NUMBER;
-	
+
 	// Enable interrupt on the GPIOA pin of WLAN IRQ
 	tSLInformation.WlanInterruptEnable();
 	//attachInterrupt(P2_3, IntSpiGPIOHandler, FALLING);
@@ -284,15 +284,12 @@ SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 	// here forever!
 	if (wlan_tx_buffer[CC3000_TX_BUFFER_SIZE - 1] != CC3000_BUFFER_MAGIC_NUMBER)
 	{
-	
-		while (1)
-			;
+		while (1);
 	}
 	
 	if (sSpiInformation.ulSpiState == eSPI_STATE_POWERUP)
 	{
-		while (sSpiInformation.ulSpiState != eSPI_STATE_INITIALIZED)
-			;
+		while (sSpiInformation.ulSpiState != eSPI_STATE_INITIALIZED);
 	}
 		
 
@@ -309,10 +306,8 @@ SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 		//again to not IDLE due to IRQ
 		tSLInformation.WlanInterruptDisable();
 		
-		while (sSpiInformation.ulSpiState != eSPI_STATE_IDLE)
-		{
-			;
-		}
+		while (sSpiInformation.ulSpiState != eSPI_STATE_IDLE);
+
 		
 		sSpiInformation.ulSpiState = eSPI_STATE_WRITE_IRQ;
 		sSpiInformation.pTxPacket = pUserBuffer;
@@ -337,8 +332,7 @@ SpiWrite(unsigned char *pUserBuffer, unsigned short usLength)
 
 	// Due to the fact that we are currently implementing a blocking situation
 	// here we will wait till end of transaction
-	while (eSPI_STATE_IDLE != sSpiInformation.ulSpiState)
-		;
+	while (eSPI_STATE_IDLE != sSpiInformation.ulSpiState);
 
 	return(0);
 }

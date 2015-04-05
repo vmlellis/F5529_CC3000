@@ -19,7 +19,10 @@ void usci_spi_initialize(void)
 	UCB0CTL1 = UCSWRST | UCSSEL_2;      // Put USCI in reset mode, source USCI clock from SMCLK
 	UCB0CTL0 = SPI_MODE_0 | UCMSB | UCSYNC | UCMST;  // Use SPI MODE 0 - CPOL=0 CPHA=0
 
-	P3SEL |= (BIT0 + BIT1 + BIT2);
+	SPI_SEL |= (SPI_CLK + SPI_MISO + SPI_MOSI);
+	/*SPI_DIR |= SPI_CLK + SPI_MOSI;
+	SPI_REN |= SPI_MISO;
+	SPI_OUT |= SPI_MISO;*/
 
 	UCB0BR0 = SPI_CLOCK_DIV() & 0xFF;   // set initial speed to 4MHz
 	UCB0BR1 = (SPI_CLOCK_DIV() >> 8 ) & 0xFF;

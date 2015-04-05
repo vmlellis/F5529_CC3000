@@ -107,9 +107,13 @@ uint8_t Wifi_getMacAddress(unsigned char *mac_addr) {
 		return 0;
 	}
 
-	if (nvmem_get_mac_address(mac_addr) != CC3000_SUCCESS) {
+	/*if (nvmem_get_mac_address(mac_addr) != CC3000_SUCCESS) {
 		return 0;
-	}
+	}*/
+
+	tNetappIpconfigRetArgs config;
+	netapp_ipconfig(&config);
+	memcpy(mac_addr, &(config.uaMacAddr), sizeof(config.uaMacAddr));
 
 	return 1;
 }
@@ -615,7 +619,7 @@ uint8_t WiFi_dnsLookup(const char *hostname, uint32_t* ip_address) {
 }
 
 /*
- * Realizar o update do Firmware para a versão 1.1.0
+ * Realizar o update do Firmware para a versão 1.24
  */
 //uint8_t WiFi_updateFirmware() {
 //	int8_t mac_status = -1;

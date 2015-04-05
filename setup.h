@@ -30,6 +30,14 @@
 #define WLAN_EN_PIN        BIT5	 // P6.5
 #define WLAN_IRQ_PIN       BIT0  // P2.0
 
+#define SPI_SEL		P3SEL
+#define SPI_DIR     P3DIR
+#define SPI_OUT     P3OUT
+#define SPI_REN     P3REN
+
+#define SPI_MOSI 	BIT0 // P3.0
+#define SPI_MISO 	BIT1 // P3.1
+#define SPI_CLK 	BIT2 // P3.2
 
 // Ports
 #define WLAN_CS_SEL       	P2SEL

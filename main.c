@@ -4,7 +4,7 @@
  *  Construido com a IDE CCSv6 e compilador GNU v4.9.1 (Red Hat)
  */
 
-#define WLAN_SSID       "ssid_name"        // cannot be longer than 32 characters!
+#define WLAN_SSID       "mySSID"        // cannot be longer than 32 characters!
 #define WLAN_PASS       "supersecret"
 
 #include <msp430f5529.h>
@@ -18,6 +18,7 @@
 volatile int counter = 0;
 volatile int counterRX = 0;
 volatile int counterTX = 0;
+volatile int counterSPI = 0;
 
 void initPorts();
 
@@ -92,6 +93,8 @@ int main(void) {
     setupUart();
     setupI2C();
 
+    uart_printf("Inicializando o WiFi...\r\n");
+    _enable_interrupts();
     if (WiFi_init()) {
     	wifiInit = 1;
     }
@@ -106,16 +109,19 @@ int main(void) {
     if (lcdEnabled) {
     	lcd_blue_config();
     	lcd_clear();
+    	lcd_print("LCD HABILITADO! ");
     }
 
     if (wifiInit) {
 		uart_printf("Conectando no WiFi...\r\n");
 		if (lcdEnabled) {
+			lcd_clear();
 			lcd_print("Conectando...   ");
 		}
 
 		if (WiFi_connectClosedAP(ssid, WLAN_SEC_WPA2, pass, timeoutWifi)) {
 			if (lcdEnabled) {
+				lcd_clear();
 				lcd_print("Conectado!      ");
 			}
 
@@ -126,7 +132,7 @@ int main(void) {
 
 			uint8_t mac[6];
 			if (Wifi_getMacAddress(mac)) {
-				uart_printf("MAC: %x:%x:%x:%x:%x:%x\r\n", mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
+				uart_printf("MAC: %h:%h:%h:%h:%h:%h\r\n", mac[5], mac[4], mac[3], mac[2], mac[1], mac[0]);
 			}
 
 			uint8_t ver[2];
@@ -165,6 +171,7 @@ int main(void) {
 		}
 		else {
 			if (lcdEnabled) {
+				lcd_clear();
 				lcd_print("Erro na conexão!");
 			}
 		}
@@ -173,6 +180,7 @@ int main(void) {
     else {
     	uart_printf("Erro na Inicialização do WiFi!\r\n");
     	if (lcdEnabled) {
+    		lcd_clear();
 			lcd_print("Erro no Wifi!   ");
 		}
     }
@@ -332,4 +340,5 @@ void PORT2_ISR (void)
 		IntSpiGPIOHandler();
 		P2IFG &= ~WLAN_IRQ_PIN;
 	}
+	counterSPI++;
 }
