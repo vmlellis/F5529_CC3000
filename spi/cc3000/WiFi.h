@@ -5,8 +5,8 @@
  *      Author: Victor
  */
 
-#ifndef SPI_CC3000_WIFI_H_
-#define SPI_CC3000_WIFI_H_
+#ifndef F5529___CC3000_WEBSERVER_SPI_CC3000_WIFI_H_
+#define F5529___CC3000_WEBSERVER_SPI_CC3000_WIFI_H_
 
 #include "utility/SimplelinkWifi.h"
 
@@ -36,4 +36,4 @@ uint8_t WiFi_countSocket(uint8_t add_sock);
 uint8_t WiFi_getInitStatus();
 uint8_t WiFi_getDHCPStatus();
 
-#endif /* SPI_CC3000_WIFI_H_ */
+#endif /* F5529___CC3000_WEBSERVER_SPI_CC3000_WIFI_H_ */

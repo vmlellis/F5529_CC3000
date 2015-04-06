@@ -5,8 +5,8 @@
  *      Author: Victor
  */
 
-#ifndef SPI_CC3000_WIFICLIENT_H_
-#define SPI_CC3000_WIFICLIENT_H_
+#ifndef F5529___CC3000_WEBSERVER_SPI_CC3000_WIFICLIENT_H_
+#define F5529___CC3000_WEBSERVER_SPI_CC3000_WIFICLIENT_H_
 
 #include "WiFi.h"
 
@@ -24,4 +24,4 @@ uint8_t WifiClient_connectHost(const char* hostname, uint16_t port);
 uint8_t WifiClient_connect(uint32_t ip, uint16_t port);
 uint8_t WiFiClient_close();
 
-#endif /* SPI_CC3000_WIFICLIENT_H_ */
+#endif /* F5529___CC3000_WEBSERVER_SPI_CC3000_WIFICLIENT_H_ */

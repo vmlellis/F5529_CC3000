@@ -44,7 +44,7 @@ uint8_t cc3000_is_initialized = 0;
 uint8_t cc3000_numNetworsScanned = 0;
 
 // Para controle do socket
-static uint8_t calculator_socket_number = 0;
+int8_t calculator_socket_number = 0;
 
 /*
  * Seta os valores de Timeout do CC3000;

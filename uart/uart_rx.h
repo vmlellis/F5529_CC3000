@@ -5,8 +5,8 @@
  *      Author: Victor
  */
 
-#ifndef UART_UART_RX_H_
-#define UART_UART_RX_H_
+#ifndef F5529___CC3000_WEBSERVER_UART_UART_RX_H_
+#define F5529___CC3000_WEBSERVER_UART_UART_RX_H_
 
 /*#include <stdlib.h>*/
 #include <inttypes.h>
@@ -18,4 +18,4 @@ uint8_t uart_readBytes(char *buffer, uint8_t length);
 uint8_t uart_readBytesUntil(char terminator, char *buffer, uint8_t length);
 uint8_t uart_available();
 
-#endif /* UART_UART_RX_H_ */
+#endif /* F5529___CC3000_WEBSERVER_UART_UART_RX_H_ */

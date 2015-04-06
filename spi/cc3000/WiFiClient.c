@@ -9,7 +9,7 @@
 
 extern fd_set gConnectedSockets;
 
-static long clientSocket = 255;
+long clientSocket = 255;
 
 // Para o controle de buffer
 static uint8_t rx_buf[16];
@@ -152,6 +152,7 @@ uint8_t WiFiClient_connected() {
 
 	/* If the connection was open or there is data */
 	return FD_ISSET(clientSocket, &gConnectedSockets) || WiFiClient_available();
+	//return !(!FD_ISSET(clientSocket, &gConnectedSockets) && !WiFiClient_available());
 }
 
 /*

@@ -5,8 +5,8 @@
  *      Author: Victor
  */
 
-#ifndef SPI_CC3000_WIFIUDP_H_
-#define SPI_CC3000_WIFIUDP_H_
+#ifndef F5529___CC3000_WEBSERVER_SPI_CC3000_WIFIUDP_H_
+#define F5529___CC3000_WEBSERVER_SPI_CC3000_WIFIUDP_H_
 
 #include "WiFi.h"
 
@@ -32,4 +32,4 @@ size_t WiFiUDP_write_buffer(const uint8_t *buffer, size_t size);
 int WiFiUDP_endPacket();
 void WiFiUDP_close();
 
-#endif /* SPI_CC3000_WIFIUDP_H_ */
+#endif /* F5529___CC3000_WEBSERVER_SPI_CC3000_WIFIUDP_H_ */

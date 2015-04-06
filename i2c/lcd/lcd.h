@@ -7,8 +7,8 @@
  *      Author: Victor
  */
 
-#ifndef I2C_LCD_LCD_H_
-#define I2C_LCD_LCD_H_
+#ifndef F5529___CC3000_WEBSERVER_I2C_LCD_LCD_H_
+#define F5529___CC3000_WEBSERVER_I2C_LCD_LCD_H_
 
 #include <inttypes.h>
 #include <stdio.h> // for size_t
@@ -380,4 +380,4 @@ void lcd_command(uint8_t value);
  */
 void lcd_write(uint8_t value);
 
-#endif /* I2C_LCD_LCD_H_ */
+#endif /* F5529___CC3000_WEBSERVER_I2C_LCD_LCD_H_ */

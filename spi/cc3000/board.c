@@ -104,7 +104,7 @@ void pio_init()
 long ReadWlanInterruptPin(void)
 {
 	// Return the status of IRQ
-	return    (WLAN_IRQ_IN & WLAN_IRQ_PIN);
+	return (WLAN_IRQ_IN & WLAN_IRQ_PIN);
 	//return digitalRead(IRQpin);
 }
 
@@ -125,6 +125,10 @@ void WlanInterruptEnable()
 	WLAN_IRQ_IES |= WLAN_IRQ_PIN;
 	WLAN_IRQ_IE |= WLAN_IRQ_PIN;
 	WLAN_IFG_PORT &= ~WLAN_IRQ_PIN;
+
+	if (!ReadWlanInterruptPin()) {
+		IntSpiGPIOHandler();
+	}
 
 
 

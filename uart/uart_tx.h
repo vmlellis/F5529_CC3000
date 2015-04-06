@@ -9,11 +9,11 @@
  *  Construido com a IDE CCSv6 e compilador GNU v4.9.1 (Red Hat)
  *****************************************************************************/
 
-#ifndef UART_UART_TX_H_
-#define UART_UART_TX_H_
+#ifndef F5529___CC3000_WEBSERVER_UART_UART_TX_H_
+#define F5529___CC3000_WEBSERVER_UART_UART_TX_H_
 
 void uart_putc(unsigned char);
 void uart_puts(char *);
 void uart_printf(char *format, ...);
 
-#endif /* UART_UART_TX_H_ */
+#endif /* F5529___CC3000_WEBSERVER_UART_UART_TX_H_ */

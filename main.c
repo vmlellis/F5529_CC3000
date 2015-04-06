@@ -14,6 +14,7 @@
 #include "i2c/lcd/lcd_blue.h"
 #include "spi/cc3000/WiFi.h"
 #include "spi/cc3000/WiFiServer.h"
+#include "spi/cc3000/WiFiClient.h"
 
 volatile int counter = 0;
 volatile int counterRX = 0;
@@ -74,10 +75,20 @@ uint8_t lcdEnabled = 0;
 extern void IntSpiGPIOHandler(void);
 uint8_t wifiInit = 0;
 unsigned int timeoutWifi = 30000;   // Milliseconds
+uint8_t wiFiServerInitialized = 0;
 
 char ssid[] = WLAN_SSID;     //  your network SSID (name)
 char pass[] = WLAN_PASS;     //  your network SSID (name)
 
+
+// Prototipos
+//char* append(const char *s, char c);
+void connectWiFi();
+uint8_t endsWith(char *str, char *suffix);
+uint8_t startsWith(char *str, char *pre);
+void printIndex();
+
+char current_line[100] = "";
 
 /*
  * main.c
@@ -105,13 +116,120 @@ int main(void) {
     mpuEnabled = 0;
     lcdEnabled = 0;
 
-    uint8_t lcdEnabled = lcd_blue_detect();
+    lcdEnabled = lcd_blue_detect();
     if (lcdEnabled) {
     	lcd_blue_config();
     	lcd_clear();
     	lcd_print("LCD HABILITADO! ");
     }
 
+    connectWiFi();
+
+    while (1) {
+    	if (wiFiServerInitialized) {
+    		if (WiFiServer_available()) {
+    			WiFiClient_init();
+    			long sock = WiFiServer_clientSocket();
+    			WiFiClient_openSocket(sock);
+    			uart_printf("Novo cliente\r\n");
+    			strcpy(current_line, "");
+    			//char *current_line = "";
+
+    			while (WiFiClient_connected()) {
+    				if (WiFiClient_available()) {
+						char c = WiFiClient_read();
+
+						//uart_putc(c);
+						if (c == '\n') {
+							uart_printf("%s\r\n", current_line);
+
+
+							if (strlen(current_line) == 0) {
+								break;
+						    }
+						    else {  // if you got a newline, then clear currentLine:
+						    	strcpy(current_line, "");
+						    	//currentLine = "";
+
+						    	//realloc(current_line, 1);
+						    	//current_line[0] = '\0';
+						    	//free(current_line);
+						    	//current_line = "";
+						    	/*char *aux = malloc(1);
+						    	aux[0] = '\0';
+						    	free(current_line);
+						    	current_line = aux;*/
+						    }
+						}
+						else if (c != '\r') {
+							// add character to current line
+							strncat(current_line, &c, 1);
+							//uart_printf("Add: %s\r\n", current_line);
+							/*char *new_line = append(current_line, c);
+							if (new_line != NULL) {
+								//free(current_line);
+								//current_line = new_line;
+								//uart_printf("Add: %s\r\n", current_line);
+							}*/
+							/*if (c != (char)-1) {
+
+								// add character to current line
+								size_t len = strlen(current_line);
+								realloc(current_line, len+1);
+								current_line[len] = c;
+								current_line[len+1] = '\0';
+								/*size_t len = strlen(current_line);
+								char *aux = malloc(len + 2);
+								strcpy(aux, current_line);
+								aux[len] = c;
+								aux[len+1] = '\0';
+								free(current_line);
+								current_line = aux;
+								//uart_printf("Add: %s\r\n", current_line);
+							//}*/
+						}
+
+						if (endsWith(current_line, "GET / ") || endsWith(current_line, "GET /index.html ")) {
+							printIndex();
+						}
+
+
+    				}
+    			}
+    			// Close the connection
+    			WiFiClient_close();
+    			uart_printf("Ciente desconectou\r\n");
+    			//free(current_line);
+    		}
+
+    	}
+
+
+    	//delay(500);
+
+    	//counter++;
+
+    	//__bis_SR_register(LPM0_bits + GIE);       // Entra no modo de baixo consumo com as interrupções habilitadas
+
+    }
+
+
+	return 0;
+}
+
+/*char* append(const char *s, char c) {
+    int len = strlen(s);
+    char *buf = malloc(len+2);
+    strcpy(buf, s);
+    buf[len] = c;
+    buf[len + 1] = '\0';
+    uart_printf("Str: %s\r\n", s);
+    uart_printf("Add: %c\r\n", c);
+    uart_printf("Buffer: %s\r\n", buf);
+    return strdup(buf);
+}*/
+
+void connectWiFi() {
     if (wifiInit) {
 		uart_printf("Conectando no WiFi...\r\n");
 		if (lcdEnabled) {
@@ -127,7 +245,7 @@ int main(void) {
 
 			uint8_t ip_address[4];
 			if (WiFi_getLocalIP((uint32_t *)ip_address)) {
-				uart_printf("IP: %i.%i.%i.%i\r\n", ip_address[0], ip_address[1], ip_address[2], ip_address[3]);
+				uart_printf("IP: %i.%i.%i.%i\r\n", ip_address[3], ip_address[2], ip_address[1], ip_address[0]);
 			}
 
 			uint8_t mac[6];
@@ -142,12 +260,12 @@ int main(void) {
 
 			uint8_t subnet[4];
 			if (WiFi_getSubnetMask((uint32_t *) subnet)) {
-				uart_printf("Subnet: %i.%i.%i.%i\r\n", subnet[0], subnet[1], subnet[2], subnet[3]);
+				uart_printf("Subnet: %i.%i.%i.%i\r\n", subnet[3], subnet[2], subnet[1], subnet[0]);
 			}
 
 			uint8_t gateway[4];
 			if (WiFi_getGatewayIP((uint32_t *) gateway)) {
-				uart_printf("Gateway: %i.%i.%i.%i\r\n", gateway[0], gateway[1], gateway[2], gateway[3]);
+				uart_printf("Gateway: %i.%i.%i.%i\r\n", gateway[3], gateway[2], gateway[1], gateway[0]);
 			}
 
 			char wifi_ssid[32];
@@ -157,10 +275,11 @@ int main(void) {
 
 			uint8_t hostIp[4];
 			if (WiFi_dnsLookup("google.com", (uint32_t *)hostIp)) {
-				uart_printf("Google IP: %i.%i.%i.%i\r\n", hostIp[0], hostIp[1], hostIp[2], hostIp[3]);
+				uart_printf("Google IP: %i.%i.%i.%i\r\n", hostIp[3], hostIp[2], hostIp[1], hostIp[0]);
 			}
 
 			if (WiFiServer_init(80)) {
+				wiFiServerInitialized = 1;
 				uart_printf("Servidor inicializado\r\n");
 			}
 			else {
@@ -184,40 +303,54 @@ int main(void) {
 			lcd_print("Erro no Wifi!   ");
 		}
     }
+}
 
+uint8_t startsWith(char *str, char *pre)
+{
+	if (str == NULL || pre == NULL || strlen(str) < strlen(pre)) return 0;
+	return strncmp(pre, str, strlen(pre)) == 0;
+}
 
-    while (1) {
+uint8_t endsWith(char *str, char *suffix) {
+	if (str == NULL || suffix == NULL || strlen(str) < strlen(suffix)) return 0;
+	return strcmp(&str[strlen(str) - strlen(suffix)], suffix) == 0;
+}
 
-    	/*
-    	uint8_t enable = lcd_blue_detect();
+void client_println(const char *str) {
+	WifiClient_write_buffer((const uint8_t*) str, strlen(str));
+	/*int size = strlen(str);
+	while (size > 0) {
+		char c = str[size];
+		WiFiClient_write(c);
+		size--;
+	}*/
+	WiFiClient_write('\r');
+	WiFiClient_write('\n');
 
-    	if (enable) {
-    		uart_printf("LCD Habilitado\r\n");
-    		if (lcdEnabled == 0) {
-    			uart_printf("Configurando LCD...\r\n");
+	/*char c;
+	while ((c = *str++)) {
+		WiFiClient_write(c);
+		//uart_putc(c);
+	}
+	WiFiClient_write('\n');
+	//uart_putc('\n');
+	 */
 
-    			lcdEnabled = 1;
-    		}
+	//uart_printf("%s\r\n", str);
+}
 
-    	}
-    	else {
-    		uart_printf("LCD Desabilitado\r\n");
-    		if (lcdEnabled)
-    			lcdEnabled = 0;
-    	}
-    	*/
+void printIndex()
+{
+	// HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
+	// and a content-type so the client knows what's coming, then a blank line:
+	client_println("HTTP/1.1 200 OK");
+	client_println("Content-type:text/html");
+	WiFiClient_write('\r');
+	WiFiClient_write('\n');
+	client_println("<html><head><title>CC3000 Energia Webpage</title></head><body align=center>");
+	client_println("<h1 align=center><font color=\"blue\">Welcome To CC3000 Web Server</font></h1>");
+	client_println("</body></html>");
 
-
-    	delay(500);
-
-    	counter++;
-
-    	__bis_SR_register(LPM0_bits + GIE);       // Entra no modo de baixo consumo com as interrupções habilitadas
-
-    }
-
-
-	return 0;
 }
 
 void initPorts() {

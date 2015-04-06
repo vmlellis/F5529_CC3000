@@ -8,8 +8,8 @@
  *      Author: Victor
  */
 
-#ifndef I2C_LCD_LCD_BLUE_H_
-#define I2C_LCD_LCD_BLUE_H_
+#ifndef F5529___CC3000_WEBSERVER_I2C_LCD_LCD_BLUE_H_
+#define F5529___CC3000_WEBSERVER_I2C_LCD_LCD_BLUE_H_
 
 #include <inttypes.h>
 
@@ -71,4 +71,4 @@
 uint8_t lcd_blue_detect(void); 		// Verificar a presença do LCD
 void lcd_blue_config(void);			// Configuração do LCD
 
-#endif /* I2C_LCD_LCD_BLUE_H_ */
+#endif /* F5529___CC3000_WEBSERVER_I2C_LCD_LCD_BLUE_H_ */

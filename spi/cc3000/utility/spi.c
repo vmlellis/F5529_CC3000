@@ -548,8 +548,7 @@ SpiTriggerRxProcessing(void)
 	// here forever!
 	if (sSpiInformation.pRxPacket[CC3000_RX_BUFFER_SIZE - 1] != CC3000_BUFFER_MAGIC_NUMBER)
 	{
-		while (1)
-			;
+		while (1);
 	}
 	
 	sSpiInformation.ulSpiState = eSPI_STATE_IDLE;

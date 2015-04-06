@@ -54,8 +54,10 @@ uint8_t WiFiServer_available() {
 	addrlen = sizeof(clientaddr);
 
 	clientDescriptor = accept(serverSocket, (sockaddr *) &clientaddr, &addrlen);
-	if(clientDescriptor < 0)
+	if(clientDescriptor < 0) {
+		WiFi_countSocket(0);
 		return 0;
+	}
 
 	return 1;
 }

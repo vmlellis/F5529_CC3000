@@ -5,8 +5,8 @@
  *      Author: Victor
  */
 
-#ifndef SPI_CC3000_WIFISERVER_H_
-#define SPI_CC3000_WIFISERVER_H_
+#ifndef F5529___CC3000_WEBSERVER_SPI_CC3000_WIFISERVER_H_
+#define F5529___CC3000_WEBSERVER_SPI_CC3000_WIFISERVER_H_
 
 #include "WiFi.h"
 
@@ -15,4 +15,4 @@ uint8_t WiFiServer_available();
 long WiFiServer_clientSocket();
 uint8_t WiFiServer_write(uint8_t b);
 
-#endif /* SPI_CC3000_WIFISERVER_H_ */
+#endif /* F5529___CC3000_WEBSERVER_SPI_CC3000_WIFISERVER_H_ */

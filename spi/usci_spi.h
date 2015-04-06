@@ -5,8 +5,8 @@
  *      Author: Victor
  */
 
-#ifndef SPI_USCI_SPI_H_
-#define SPI_USCI_SPI_H_
+#ifndef F5529___CC3000_WEBSERVER_SPI_USCI_SPI_H_
+#define F5529___CC3000_WEBSERVER_SPI_USCI_SPI_H_
 
 #include <msp430.h>
 #include <inttypes.h>
@@ -49,4 +49,4 @@ void usci_spi_set_bitorder(const uint8_t);
 void usci_spi_set_datamode(const uint8_t);
 void usci_spi_set_divisor(const uint16_t clkdivider);
 
-#endif /* SPI_USCI_SPI_H_ */
+#endif /* F5529___CC3000_WEBSERVER_SPI_USCI_SPI_H_ */

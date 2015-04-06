@@ -61,7 +61,7 @@
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.OUTPUT_FILE.1790242167" name="Output file (-o)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.OUTPUT_FILE" value="&quot;${ProjName}.out&quot;" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.MAP_FILE.801660653" name="Write a map file (-Map)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.MAP_FILE" value="&quot;${ProjName}.map&quot;" valueType="string"/>
-								<option id="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.OTHER_FLAGS.372949607" name="Other flags" superClass="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.OTHER_FLAGS" valueType="stringList"/>
+								<option id="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.OTHER_FLAGS.372949607" name="Other flags" superClass="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.OTHER_FLAGS"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.SCRIPTS.2013305350" name="Linker command files (-T, --script)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.SCRIPTS"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.GC_SECTIONS.1255102404" name="Remove unused sections (--gc-sections)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.GC_SECTIONS" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.ENTRY.204557880" name="Set start address (-e, --entry)" superClass="com.ti.ccstudio.buildDefinitions.MSP430_GNU_4.0.linkerID.ENTRY" value="" valueType="string"/>
